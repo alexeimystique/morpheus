@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 
+
 def convert_log_to_txt(json_file, txt_file=None):
     if txt_file is None:
         txt_file = os.path.splitext(json_file)[0] + ".txt"
@@ -39,6 +40,7 @@ def convert_log_to_txt(json_file, txt_file=None):
         return
 
     print(f"Converted {json_file} -> {txt_file}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert Morpheus JSON logs to readable TXT.")

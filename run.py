@@ -30,7 +30,7 @@ config = {}
 with open("config.cfg", "r", encoding='utf-8') as file:
     for line in file:
         parameter = line.split(" = ")
-        config.update({parameter[0]: parameter[1].replace("\n","")})
+        config.update({parameter[0]: parameter[1].replace("\n", "")})
 
 if config["debug_message"] == "1":
     print("Configuration file initialized.")
@@ -74,7 +74,7 @@ print("Loading... this could take a few minutes.")
 
 session_start_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
-log_morpheus.save_session_log(session_start_time, None,"start")
+log_morpheus.save_session_log(session_start_time, None, "start")
 session_log_messages = []
 
 start_message = log_morpheus.get_start_message()
