@@ -83,8 +83,6 @@ messages.append(start_message)
 previous_chats.append(start_message)
 session_log_messages.append(start_message)
 
-print(messages)
-
 # First response from Morpheus
 response = ollama.chat(model=model_name, messages=messages)
 answer = response.message.content
