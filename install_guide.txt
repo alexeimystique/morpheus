@@ -1,0 +1,5 @@
+1. Clone this repo.
+2. Install ollama in terminal:
+pip install ollama
+3. Install model:
+ollama pull gpt-oss:20b
