@@ -153,6 +153,9 @@ def edit_config():
 
     edit_par = input("Choose parameter to edit: ")
     edit_value = input("Choose new value: ")
+    if edit_par == "" or edit_value == "":
+        print("Canceled editing config.")
+        return
     config_dict.update({edit_par: edit_value})
 
     config_str = ""
