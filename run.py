@@ -47,15 +47,14 @@ def run():
     if debug:
         print("System prompt initialized.")
 
-    if log_morpheus.load_logs("logs/total_log.json") != "Empty file" and is_logging:
-        previous_chats = log_morpheus.load_logs("logs/total_log.json")
+    if log_morpheus.load_logs("logs/total_log.ndjson") != "Empty file" and is_logging:
+        previous_chats = log_morpheus.load_logs("logs/total_log.ndjson")
         # Initialize conversation - load system prompts and previous chats
         messages = [
                        {"role": "system", "content": system_prompt},
                        {"role": "user", "content": " "},
                    ] + previous_chats
     else:
-        previous_chats = []
         messages = [
                        {"role": "system", "content": system_prompt},
                        {"role": "user", "content": " "},
@@ -86,10 +85,8 @@ def run():
     messages.append(start_message)
 
     if is_logging:
-        log_morpheus.save_session_log(session_start_time, None, "start")
-        session_log_messages = []
-        previous_chats.append(start_message)
-        session_log_messages.append(start_message)
+        log_morpheus.append_total_log(None, "start")
+        log_morpheus.append_session_log(session_start_time, None, "start")
 
     # First response from Morpheus
     response = ollama.chat(model=model_name, messages=messages)
@@ -103,10 +100,8 @@ def run():
     first_response = {"role": "assistant", "content": answer}
     messages.append(first_response)
     if is_logging:
-        previous_chats.append(first_response)
-        session_log_messages.append(first_response)
-        log_morpheus.save_session_log(session_start_time, session_log_messages, "in_progress")
-        log_morpheus.save_total_log(previous_chats, "in_progress")
+        log_morpheus.append_session_log(session_start_time, messages[-1])
+        log_morpheus.append_total_log(messages[-1])
 
     # Continue the session
     while True:
@@ -115,17 +110,15 @@ def run():
         if not user_input:
             messages.append(log_morpheus.get_end_message())  # Technically unnecessary if logging is disabled.
             if is_logging:
-                log_morpheus.save_session_log(session_start_time, session_log_messages, "end")
-                log_morpheus.save_total_log(previous_chats, "end")
+                log_morpheus.append_session_log(session_start_time, None, "end")
+                log_morpheus.append_total_log(None, "end")
             break  # exit loop - exit program
 
         user_message = {"role": "user", "content": user_input}
         messages.append(user_message)
         if is_logging:
-            previous_chats.append(user_message)
-            session_log_messages.append(user_message)
-            log_morpheus.save_session_log(session_start_time, session_log_messages, "in_progress")
-            log_morpheus.save_total_log(previous_chats, "in_progress")
+            log_morpheus.append_session_log(session_start_time, messages[-1])
+            log_morpheus.append_total_log(messages[-1])
 
         if response_time:
             start_time = time.time()
@@ -144,10 +137,8 @@ def run():
 
         messages.append(reply)
         if is_logging:
-            previous_chats.append(reply)
-            session_log_messages.append(reply)
-            log_morpheus.save_session_log(session_start_time, session_log_messages, "in_progress")
-            log_morpheus.save_total_log(previous_chats, "in_progress")
+            log_morpheus.append_session_log(session_start_time, messages[-1])
+            log_morpheus.append_total_log(messages[-1])
 
 
 def edit_config():

@@ -3,43 +3,61 @@ import os
 import argparse
 
 
-def convert_log_to_txt(json_file, txt_file=None):
-    if txt_file is None:
-        txt_file = os.path.splitext(json_file)[0] + ".txt"
+def ndjson_to_txt(ndjson_path, txt_path=None):
+    """Convert NDJSON log into a readable transcript."""
+    if not os.path.exists(ndjson_path):
+        raise FileNotFoundError(f"No such file: {ndjson_path}")
 
-    try:
-        with open(json_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: {json_file} not found.")
-        return
-    except json.JSONDecodeError as e:
-        print(f"Error: {json_file} is not a valid JSON. {e}")
-        return
-
-    if not isinstance(data, list):
-        print(f"Error: Expected a list of messages in {json_file}, got {type(data).__name__}.")
-        return
-
-    try:
-        with open(txt_file, "w", encoding="utf-8") as out:
-            for entry in data:
-                if not isinstance(entry, dict):
-                    print(f"Skipping invalid entry: {entry}")
-                    continue
+    lines = []
+    with open(ndjson_path, "r", encoding="utf-8") as f:
+        for raw in f:
+            raw = raw.strip()
+            if not raw:
+                continue
+            try:
+                entry = json.loads(raw)
                 role = entry.get("role", "unknown").upper()
                 if role == "ASSISTANT":
                     role = "MORPHEUS"
                 content = entry.get("content", "").strip()
                 if "NEW CHAT - Session start time:" in content or "END CHAT - Session end time:" in content:
-                    out.write(f"{content}\n\n")
+                    lines.append(f"\n--- {content} ---\n")
                 else:
-                    out.write(f"{role}: {content}\n\n")
-    except Exception as e:
-        print(f"Error writing {txt_file}: {e}")
+                    lines.append(f"[{role}] {content}")
+            except json.JSONDecodeError:
+                continue
+
+    if txt_path is None:
+        txt_path = ndjson_path.replace(".ndjson", ".txt")
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+    print(f"Converted {ndjson_path} -> {txt_path} with {len(lines)} lines.")
+
+
+def batch_convert_logs(folder):
+    """Convert all .ndjson logs in a folder to .txt transcripts."""
+    if folder is None:
+        folder = os.getcwd()
+    if not os.path.exists(folder):
+        print(f"No such folder: {folder}")
         return
 
-    print(f"Converted {json_file} -> {txt_file}")
+    files = [f for f in os.listdir(folder) if f.endswith(".ndjson")]
+    if not files:
+        print("No .ndjson files found.")
+        return
+
+    for f in files:
+        path = os.path.join(folder, f)
+        print(f"Converting {path}...")
+        try:
+            ndjson_to_txt(path)
+        except Exception as e:
+            print(f"Error converting {path}: {e}")
+
+    print("Batch conversion complete.")
 
 
 if __name__ == "__main__":
@@ -50,9 +68,13 @@ if __name__ == "__main__":
 
     if not args.json_file:
         print("This is used to convert JSON log files into easier to read TXT files.")
-        # No arguments: ask interactively
-        json_file = input("Enter the name of the the JSON log file: ").strip()
-        txt_file = input("Enter the name of the output TXT file (leave blank for auto-naming): ").strip() or None
-        convert_log_to_txt(json_file, txt_file)
+        # If no arguments are present, just ask.
+        if input("Do you want to batch convert all NDJSON log files in a folder into TXT files? (y/n): ") == "y":
+            batch_path = input("Path to logs (leave blank if this script is in the folder): ").strip() or None
+            batch_convert_logs(batch_path)
+        else:
+            json_file = input("Enter the name of the the JSON log file: ").strip()
+            txt_file = input("Enter the name of the output TXT file (leave blank for auto-naming): ").strip() or None
+            ndjson_to_txt(json_file, txt_file)
     else:
-        convert_log_to_txt(args.json_file, args.txt_file)
+        ndjson_to_txt(args.json_file, args.txt_file)
