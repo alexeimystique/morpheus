@@ -33,9 +33,10 @@ def run():
         for line in file:
             parameter = line.split(" = ")
             config.update({parameter[0]: parameter[1].replace("\n", "")})
+    response_time = config.get("response_time") == "1"
+    thinking_message = config.get("thinking_message") == "1"
     debug = config.get("debug_message") == "1"
     is_logging = config.get("logging") == "1"
-    response_time = config.get("response_time") == "1"
 
     if debug:
         print("Configuration file initialized.")
@@ -128,7 +129,7 @@ def run():
 
         if response_time:
             start_time = time.time()
-        if config["thinking_message"] == "1":
+        if thinking_message:
             print("Thinking...")
 
         response = ollama.chat(model=model_name, messages=messages)
