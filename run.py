@@ -25,9 +25,6 @@ def run():
     # If ollama yells at you for not having enough memory, restart your computer.
     # gemma3:12b can definitely run on 16GB of RAM, albeit... slow.
 
-    model_name = 'gemma3:12b'
-    print(f"Running on {model_name}.")
-
     config = {}
     with open("config.cfg", "r", encoding='utf-8') as file:
         for line in file:
@@ -37,6 +34,9 @@ def run():
     thinking_message = config.get("thinking_message") == "1"
     debug = config.get("debug_message") == "1"
     is_logging = config.get("logging") == "1"
+
+    model_name = config["model_name"]
+    print(f"Running on {model_name}.")
 
     if debug:
         print("Configuration file initialized.")
