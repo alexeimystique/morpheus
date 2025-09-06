@@ -29,12 +29,12 @@ def load_logs(path):  # Loads NDJSON logs
 
 # Just for generating start and end messages
 def get_start_message():
-    return {"role": "user", "content": "NEW CHAT - Session start time: " +
+    return {"role": "system", "content": "NEW CHAT - Session start time: " +
             datetime.datetime.now().strftime("%Y-%B-%d %H:%M:%S")}
 
 
 def get_end_message():
-    return {"role": "user", "content": "END CHAT - Session end time: " +
+    return {"role": "system", "content": "END CHAT - Session end time: " +
             datetime.datetime.now().strftime("%Y-%B-%d %H:%M:%S")}
 
 
