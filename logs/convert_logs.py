@@ -61,19 +61,19 @@ def batch_convert_logs(folder):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert Morpheus JSON logs to readable TXT.")
-    parser.add_argument("json_file", nargs="?", help="Path to the JSON log file.")
+    parser = argparse.ArgumentParser(description="Convert Morpheus NDJSON logs to readable TXT.")
+    parser.add_argument("json_file", nargs="?", help="Path to the NDJSON log file.")
     parser.add_argument("txt_file", nargs="?", help="Optional path for output TXT file.")
     args = parser.parse_args()
 
     if not args.json_file:
-        print("This is used to convert JSON log files into easier to read TXT files.")
+        print("This is used to convert NDJSON log files into easier to read TXT files.")
         # If no arguments are present, just ask.
         if input("Do you want to batch convert all NDJSON log files in a folder into TXT files? (y/n): ") == "y":
             batch_path = input("Path to logs (leave blank if this script is in the folder): ").strip() or None
             batch_convert_logs(batch_path)
         else:
-            json_file = input("Enter the name of the the JSON log file: ").strip()
+            json_file = input("Enter the name of the the NDJSON log file: ").strip()
             txt_file = input("Enter the name of the output TXT file (leave blank for auto-naming): ").strip() or None
             ndjson_to_txt(json_file, txt_file)
     else:
