@@ -97,7 +97,8 @@ def run():
         print(f"Response time: {int(round(end_time))}s")
     print("MORPHEUS:", answer)
 
-    first_response = {"role": "assistant", "content": answer}
+    clock_now = datetime.datetime.now().strftime("%H:%M:%S")
+    first_response = {"role": "assistant", "content": answer, "timestamp": clock_now}
     messages.append(first_response)
     if is_logging:
         log_morpheus.append_session_log(session_start_time, messages[-1])
@@ -114,7 +115,8 @@ def run():
                 log_morpheus.append_total_log(None, "end")
             break  # exit loop - exit program
 
-        user_message = {"role": "user", "content": user_input}
+        clock_now = datetime.datetime.now().strftime("%H:%M:%S")
+        user_message = {"role": "user", "content": user_input,  "timestamp": clock_now}
         messages.append(user_message)
         if is_logging:
             log_morpheus.append_session_log(session_start_time, messages[-1])
@@ -132,8 +134,9 @@ def run():
             end_time = time.time() - start_time
             print(f"Response time: {int(round(end_time))}s")
 
+        clock_now = datetime.datetime.now().strftime("%H:%M:%S")
         print("MORPHEUS:", answer)
-        reply = {"role": "assistant", "content": answer}
+        reply = {"role": "assistant", "content": answer, "timestamp": clock_now}
 
         messages.append(reply)
         if is_logging:

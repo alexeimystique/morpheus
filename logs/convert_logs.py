@@ -20,10 +20,11 @@ def ndjson_to_txt(ndjson_path, txt_path=None):
                 if role == "ASSISTANT":
                     role = "MORPHEUS"
                 content = entry.get("content", "").strip()
+                timestamp = entry.get("timestamp")
                 if "NEW CHAT - Session start time:" in content or "END CHAT - Session end time:" in content:
                     lines.append(f"\n--- {content} ---\n")
                 else:
-                    lines.append(f"[{role}] {content}")
+                    lines.append(f"[{timestamp}] [{role}] {content}")
             except json.JSONDecodeError:
                 continue
 
